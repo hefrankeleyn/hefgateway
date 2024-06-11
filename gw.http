@@ -1,0 +1,20 @@
+###
+### hello
+GET http://localhost:8888/hello
+Accept: application/json
+
+
+### gw 1
+GET http://localhost:8888/gw
+Accept: application/json
+
+
+### gw 1
+POST http://localhost:8888/gw/cn.hefrankeleyn.hefrpc.demo.api.UserService
+Content-Type: application/json
+
+{
+  "service": "cn.hefrankeleyn.hefrpc.demo.api.UserService",
+  "methodSign": "findById#int",
+  "args": [300]
+}
