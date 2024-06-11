@@ -6,6 +6,7 @@ import cn.hefrankeleyn.hefrpc.core.api.Router;
 import cn.hefrankeleyn.hefrpc.core.meta.InstanceMeta;
 import cn.hefrankeleyn.hefrpc.core.meta.ServiceMeta;
 import jakarta.annotation.Resource;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -50,21 +51,24 @@ public class GatewayHandler {
             String url = instanceMeta.toUrl();
             // 4. 获取请求报文
             Mono<String> requestBodyMono = request.bodyToMono(String.class);
-            // 5. 通过WebClient 发送post请求
-            WebClient webClient = WebClient.create(url);
-            Mono<ResponseEntity<String>> entity = webClient.post()
-                    .header("Content-Type", "application/json")
-                    .body(requestBodyMono, String.class).retrieve().toEntity(String.class);
-
-            // 6. 获取响应报文
-            Mono<String> responseBody = entity.map(ResponseEntity::getBody);
-            // 7. 组装响应报文
-            return ServerResponse.ok()
-                    .header("Content-Type", "application/json")
-                    .header("hef.gw.version", "0.0.1")
-                    .body(responseBody, String.class);
+            return requestBodyMono.flatMap(x-> invokeFromRegistry(x, url));
+        } else {
+            return ServerResponse.ok().body(Mono.just("Hello, hef gateway!"), String.class);
         }
+    }
 
-        return ServerResponse.ok().body(Mono.just("Hello, hef gateway!"), String.class);
+    private static Mono<ServerResponse> invokeFromRegistry(String x, String url) {
+        // 5. 通过WebClient 发送post请求
+        WebClient webClient = WebClient.create(url);
+        Mono<ResponseEntity<String>> entity = webClient.post()
+                .header("Content-Type", "application/json")
+                .bodyValue(x).retrieve().toEntity(String.class);
+        // 6. 获取响应报文
+        Mono<String> responseBody = entity.map(ResponseEntity::getBody);
+        // 7. 组装响应报文
+        return ServerResponse.ok()
+                .header("Content-Type", "application/json")
+                .header("hef.gw.version", "0.0.1")
+                .body(responseBody, String.class);
     }
 }

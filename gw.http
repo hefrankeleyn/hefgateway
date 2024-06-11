@@ -9,7 +9,7 @@ GET http://localhost:8888/gw
 Accept: application/json
 
 
-### gw 1
+### gw 2
 POST http://localhost:8888/gw/cn.hefrankeleyn.hefrpc.demo.api.UserService
 Content-Type: application/json
 
