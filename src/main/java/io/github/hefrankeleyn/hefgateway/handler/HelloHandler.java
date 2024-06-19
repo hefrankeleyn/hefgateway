@@ -1,4 +1,4 @@
-package io.github.hefrankeleyn.hefgateway;
+package io.github.hefrankeleyn.hefgateway.handler;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

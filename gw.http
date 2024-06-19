@@ -18,3 +18,13 @@ Content-Type: application/json
   "methodSign": "findById#int",
   "args": [300]
 }
+
+### ga 2
+POST http://localhost:8888/ga/cn.hefrankeleyn.hefrpc.demo.api.UserService
+Content-Type: application/json
+
+{
+  "service": "cn.hefrankeleyn.hefrpc.demo.api.UserService",
+  "methodSign": "findById#int",
+  "args": [300]
+}

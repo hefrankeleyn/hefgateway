@@ -6,3 +6,7 @@ server:
 
 hefregistry:
   servers: http://localhost:8383
+logging:
+  level:
+    root: error
+    io.github.hefrankeleyn.hefgateway: debug
