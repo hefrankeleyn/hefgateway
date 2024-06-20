@@ -9,8 +9,8 @@ GET http://localhost:8888/gw
 Accept: application/json
 
 
-### gw 2
-POST http://localhost:8888/gw/cn.hefrankeleyn.hefrpc.demo.api.UserService
+### gw-hefrpc
+POST http://localhost:8888/gw/hefrpc/cn.hefrankeleyn.hefrpc.demo.api.UserService
 Content-Type: application/json
 
 {
@@ -19,8 +19,8 @@ Content-Type: application/json
   "args": [300]
 }
 
-### ga 2
-POST http://localhost:8888/ga/cn.hefrankeleyn.hefrpc.demo.api.UserService
+### gw-direct
+POST http://localhost:8888/gw/direct/cn.hefrankeleyn.hefrpc.demo.api.UserService?backend=http://localhost:8081/hefrpc
 Content-Type: application/json
 
 {

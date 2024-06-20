@@ -1,4 +1,4 @@
-package io.github.hefrankeleyn.hefgateway.filter;
+package io.github.hefrankeleyn.hefgateway.web.filter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

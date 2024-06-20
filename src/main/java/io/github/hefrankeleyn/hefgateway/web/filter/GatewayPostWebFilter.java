@@ -1,4 +1,4 @@
-package io.github.hefrankeleyn.hefgateway.filter;
+package io.github.hefrankeleyn.hefgateway.web.filter;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;

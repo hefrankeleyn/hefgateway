@@ -3,21 +3,16 @@ package io.github.hefrankeleyn.hefgateway.conf;
 import cn.hefrankeleyn.hefrpc.core.api.LoadBalance;
 import cn.hefrankeleyn.hefrpc.core.api.RegistryCenter;
 import cn.hefrankeleyn.hefrpc.core.api.Router;
-import cn.hefrankeleyn.hefrpc.core.cluster.RandomLoadBalance;
+import cn.hefrankeleyn.hefrpc.core.cluster.RoundRibonLoadBalance;
 import cn.hefrankeleyn.hefrpc.core.meta.InstanceMeta;
 import cn.hefrankeleyn.hefrpc.core.registry.hef.HefRegistryCenter;
-import io.github.hefrankeleyn.hefgateway.handler.GatewayHandler;
-import io.github.hefrankeleyn.hefgateway.handler.GatewayWebHandler;
-import jakarta.annotation.Resource;
+import io.github.hefrankeleyn.hefgateway.plugins.GatewayPlugin;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
-import org.springframework.web.server.WebHandler;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -39,7 +34,7 @@ public class GatewayConfig {
 
     @Bean
     public LoadBalance<InstanceMeta> loadBalance() {
-        return new RandomLoadBalance<>();
+        return new RoundRibonLoadBalance<>();
     }
 
 
@@ -48,8 +43,7 @@ public class GatewayConfig {
         return args->{
             SimpleUrlHandlerMapping simpleUrlHandlerMapping = applicationContext.getBean(SimpleUrlHandlerMapping.class);
             Properties mappings = new Properties();
-            mappings.put("/gw/**", "gatewayWebHandler");
-            mappings.put("/ga/**", "gatewayWebHandler");
+            mappings.put(GatewayPlugin.GATEWAY_PREFIX+"/**", "gatewayWebHandler");
             simpleUrlHandlerMapping.setMappings(mappings);
             simpleUrlHandlerMapping.initApplicationContext();
         };
