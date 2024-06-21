@@ -1,6 +1,7 @@
 package io.github.hefrankeleyn.hefgateway.plugins.impl;
 
 import io.github.hefrankeleyn.hefgateway.plugins.AbstractGatewayPlugin;
+import io.github.hefrankeleyn.hefgateway.plugins.GatewayPluginChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -26,15 +27,16 @@ public class DirectPlugin extends AbstractGatewayPlugin {
     private static final String NAME = "direct";
 
     @Override
-    public Mono<Void> doHandle(ServerWebExchange exchange) {
+    public Mono<Void> doHandle(ServerWebExchange exchange, GatewayPluginChain chain) {
         log.debug("====> [DirectPlugin] doHandle....");
         // 获取直接请求的url
         String url = exchange.getRequest().getQueryParams().getFirst("backend");
         exchange.getResponse().getHeaders().add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        exchange.getResponse().getHeaders().add("plugin.direct.version", "v0.0.1");
+        exchange.getResponse().getHeaders().add("hef.gw.plugin",  getName());
         if (Objects.isNull(url) || url.isEmpty()) {
             // 直接返回
-            return exchange.getRequest().getBody().flatMap(x->exchange.getResponse().writeWith(Mono.just(x))).then();
+            return exchange.getRequest().getBody().flatMap(x->exchange.getResponse()
+                    .writeWith(Mono.just(x))).then(chain.handle(exchange));
         }
         // 4. 获取请求报文
         Flux<DataBuffer> requestBody = exchange.getRequest().getBody();
@@ -45,7 +47,9 @@ public class DirectPlugin extends AbstractGatewayPlugin {
                 .body(requestBody, DataBuffer.class).retrieve().toEntity(String.class);
         // 6. 获取响应报文
         Mono<String> responseBody = entity.map(ResponseEntity::getBody);
-        return responseBody.flatMap(res -> exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(res.getBytes()))));
+        return responseBody.flatMap(res -> exchange.getResponse()
+                .writeWith(Mono.just(exchange.getResponse().bufferFactory()
+                        .wrap(res.getBytes())))).then(chain.handle(exchange));
     }
 
     @Override

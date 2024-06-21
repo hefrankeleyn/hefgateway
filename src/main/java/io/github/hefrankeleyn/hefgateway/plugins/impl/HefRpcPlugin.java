@@ -7,6 +7,7 @@ import cn.hefrankeleyn.hefrpc.core.meta.InstanceMeta;
 import cn.hefrankeleyn.hefrpc.core.meta.ServiceMeta;
 import io.github.hefrankeleyn.hefgateway.plugins.AbstractGatewayPlugin;
 import io.github.hefrankeleyn.hefgateway.plugins.GatewayPlugin;
+import io.github.hefrankeleyn.hefgateway.plugins.GatewayPluginChain;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ public class HefRpcPlugin extends AbstractGatewayPlugin {
     private LoadBalance<InstanceMeta> loadBalance;
 
     @Override
-    public Mono<Void> doHandle(ServerWebExchange exchange) {
+    public Mono<Void> doHandle(ServerWebExchange exchange, GatewayPluginChain chain) {
         log.debug("====> [HefRpcPlugin] doHandle....");
         // 1. 从路径中获取服务名
         String service = exchange.getRequest().getPath().value().substring(gatewayPrefix().length());
@@ -68,7 +69,9 @@ public class HefRpcPlugin extends AbstractGatewayPlugin {
         Mono<String> responseBody = entity.map(ResponseEntity::getBody);
         exchange.getResponse().getHeaders().add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
         exchange.getResponse().getHeaders().add("plugin.rpc.version", "v0.0.1");
-        return responseBody.flatMap(res -> exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(res.getBytes()))));
+        return responseBody.flatMap(res -> exchange.getResponse()
+                .writeWith(Mono.just(exchange.getResponse().bufferFactory()
+                        .wrap(res.getBytes())))).then(chain.handle(exchange));
     }
 
     @Override

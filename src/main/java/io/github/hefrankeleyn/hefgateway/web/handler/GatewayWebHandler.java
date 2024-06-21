@@ -1,5 +1,6 @@
 package io.github.hefrankeleyn.hefgateway.web.handler;
 
+import io.github.hefrankeleyn.hefgateway.plugins.DefaultGatewayPluginChain;
 import io.github.hefrankeleyn.hefgateway.plugins.GatewayPlugin;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
@@ -32,12 +33,13 @@ public class GatewayWebHandler implements WebHandler {
             // {"result": "none plugins"}
             return createOtherMonoResult("{\"result\": \"none plugins\"}", exchange);
         }
-        for (GatewayPlugin plugin : pluginList) {
-            if (plugin.support(exchange)) {
-                return plugin.handle(exchange);
-            }
-        }
-        return createOtherMonoResult("{\"result\": \"none support plugins\"}", exchange);
+//        for (GatewayPlugin plugin : pluginList) {
+//            if (plugin.support(exchange)) {
+//                return plugin.handle(exchange);
+//            }
+//        }
+        return new DefaultGatewayPluginChain(pluginList).handle(exchange);
+//        return createOtherMonoResult("{\"result\": \"none support plugins\"}", exchange);
     }
 
     private static Mono<Void> createOtherMonoResult(String result, ServerWebExchange exchange) {
